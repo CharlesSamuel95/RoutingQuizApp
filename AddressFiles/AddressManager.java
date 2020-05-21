@@ -16,12 +16,20 @@ public class AddressManager{
         addressQuizList.add(address);
     }
 
-    public Address getAddress(int index){
+    public Address getAddressListItem(int index){
         return addressList.get(index);
     }
 
-    public Address getAddressQuizList(int index){
+    public Address getAddressQuizListItem(int index){
         return addressQuizList.get(index);
+    }
+
+    public List<Address> getAddressList(){
+        return addressList;
+    }
+
+    public List<Address> getAddressQuizList(){
+        return addressQuizList;
     }
 
     public int getLength(){

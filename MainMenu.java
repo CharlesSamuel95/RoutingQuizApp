@@ -89,8 +89,7 @@ public class MainMenu extends Application {
     Scanner scan;
     try {
       scan = new Scanner(new File("AddressFiles/Address.csv"));
-      int count = 0;
-
+    
       while (scan.hasNext()) {
         String row = scan.nextLine();
         String data[] = row.split(",");
@@ -272,7 +271,8 @@ public class MainMenu extends Application {
     menu.setVgap(7);
 
     /** Sets the Stage and Scene */
-    mainMenu = new Scene(menu, 800, 250);//null pointer
+    mainMenu = new Scene(menu, 800, 250);
+    window.setResizable(false);
     window.setTitle("Main Menu");
     window.setScene(mainMenu);
     window.show();
@@ -294,7 +294,8 @@ public class MainMenu extends Application {
     } else {
       // sequentail
     }
-    NumberOfQuestions quest = new NumberOfQuestions(window, manager);
+    NumberOfQuestions quest = new NumberOfQuestions(window, mainMenu, manager);
+    window.setScene(quest.createScene());
 
   }// end of createNextPage
 
