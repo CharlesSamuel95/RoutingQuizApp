@@ -18,10 +18,10 @@ import AddressFiles.AddressManager;
 import AddressFiles.Address;
 
 public class NumberOfQuestions {
-    Stage window;
-    Scene mainMenuScene;
-    Scene numOfQuestScene;
-    AddressManager manager;
+    private Stage window;
+    private Scene mainMenuScene;
+    private Scene numOfQuestScene;
+    private AddressManager manager;
     
     public NumberOfQuestions(Stage window, Scene mainMenu, AddressManager manager) {
         this.window = window;
@@ -54,7 +54,6 @@ public class NumberOfQuestions {
        /** Modifications to conponents */
        introText.setFont(Font.font("Times", FontWeight.BOLD, FontPosture.ITALIC, 20));
         
-       //errorText.
        errorText.setFont(Font.font("Times", FontWeight.BOLD, 15));
        errorText.setFill(Color.RED);
 
@@ -127,12 +126,17 @@ public class NumberOfQuestions {
         }
 
         if(input > 0 && input <= manager.getLengthOfQuizList()){
-            errorText.setText("In Range");
+            createQuiz(input);
         }
 
         else{
             errorText.setText("Input not in range");
         }
     }//end of verifyInput
+
+    private void createQuiz(long quizCount){
+        Quiz q = new Quiz(window, manager,quizCount);
+        window.setScene(q.createQuizScene());
+    }
     
 }//end of class

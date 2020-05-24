@@ -1,7 +1,6 @@
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Scanner;
 import javafx.application.Application;
@@ -48,8 +47,8 @@ import AddressFiles.Address;
 public class MainMenu extends Application {
   Stage window = new Stage();
   Scene mainMenu; //
-  static ListView<Character> includedAddress; 
-  static ArrayList<Character> listOfLetters = new ArrayList<>();
+  ListView<Character> includedAddress; 
+  ArrayList<Character> listOfLetters = new ArrayList<>();
   AddressManager manager = new AddressManager();
   
   int quizFormat = 0;
@@ -113,7 +112,14 @@ public class MainMenu extends Application {
           listOfLetters.add(new Character(addressLetter));
         }
 
+        //TRY TO REMOVE THE EMPTY STRINGS FROM THE ADDRESS. EX: LOOK AT ADDRESS WITH B QUESTION 5
+        if(addressSuffix.compareTo("") == 0){
+          manager.insert(new Address(addressPrefix, zipCode, routingNumber));
+        }
+
+        else{
         manager.insert(new Address(addressPrefix, addressSuffix, zipCode, routingNumber));
+        }
       } // end of while
       scan.close();
     } // end of try
@@ -352,8 +358,7 @@ public class MainMenu extends Application {
       textExplain.setFont(Font.font("Times", FontWeight.BOLD, 15));
 
       FlowPane pane = new FlowPane(textExplain);
-      //pane.setAlignment(Pos.CENTER);
-
+      
       Scene scene = new Scene(pane);
       Stage window = new Stage();
       window.setTitle("Listview");
