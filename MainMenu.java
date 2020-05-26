@@ -46,6 +46,7 @@ import AddressFiles.Address;
  */
 public class MainMenu extends Application {
   Stage window = new Stage();
+  Stage popUpWindow = new Stage();
   Scene mainMenu; //
   ListView<Character> includedAddress; 
   ArrayList<Character> listOfLetters = new ArrayList<>();
@@ -162,7 +163,6 @@ public class MainMenu extends Application {
     RadioButton randomBtn = new RadioButton("Random");
 
     Button nextPageBtn = new Button("Next Page");
-    Button quizPageBtn = new Button("Quiz Page");
     Button resetListViewBtn = new Button("Reset");
 
     ImageView questionImg = new ImageView(new Image("images/question-mark-image2.jpg"));
@@ -242,9 +242,6 @@ public class MainMenu extends Application {
       createNextPage(includedAddress.getSelectionModel().getSelectedItems());
     });
 
-    quizPageBtn.setOnAction(e -> {
-      createQuizPage(window);
-    });
 
     resetListViewBtn.setOnMouseEntered(e -> {
       mainMenu.setCursor(Cursor.HAND);
@@ -265,16 +262,13 @@ public class MainMenu extends Application {
     menu.add(hboxlistView, 1, 2);
     menu.add(resetListViewBtn,1,2);
     menu.add(hboxRadioOptions, 3, 2);
-
     menu.add(nextPageBtn, 3, 5);
-    menu.add(quizPageBtn, 4, 5);
-    // menu.add(new Text("" + manager.getLength()),1,5);
-
+   
     /** Modifiy panes */
     GridPane.setHalignment(nextPageBtn, HPos.CENTER);
-    GridPane.setHalignment(quizPageBtn, HPos.CENTER);
     menu.setHgap(25);
     menu.setVgap(7);
+    menu.disableProperty().bind(popUpWindow.showingProperty());
 
     /** Sets the Stage and Scene */
     mainMenu = new Scene(menu, 800, 250);
@@ -294,16 +288,17 @@ public class MainMenu extends Application {
     else
       manager.copyIntoQuizList();
 
-    if (quizFormat == 1) {
+    if (quizFormat == 1)
       // random
-      manager.shuffleQuizList();
-    } else {
+      manager.shuffleQuizList(); 
+      
+    else {
       // sequentail
     }
     NumberOfQuestions quest = new NumberOfQuestions(window, mainMenu, manager);
     window.setScene(quest.createScene());
-
   }// end of createNextPage
+
 
   // have threads read file
   private void includeSubsetOfAddress(ObservableList<Character> selectedItemsList) {
@@ -322,8 +317,8 @@ public class MainMenu extends Application {
     for (Thread thread : threadList) {
       try {
         thread.join();
-      } catch (InterruptedException e) {
-        
+      } 
+      catch (InterruptedException e) {
         e.printStackTrace();
       }
     }
@@ -360,10 +355,10 @@ public class MainMenu extends Application {
       FlowPane pane = new FlowPane(textExplain);
       
       Scene scene = new Scene(pane);
-      Stage window = new Stage();
-      window.setTitle("Listview");
-      window.setScene(scene);
-      window.show();
+      popUpWindow.setTitle("Listview");
+      popUpWindow.setScene(scene);
+      popUpWindow.show();
+      
     }
 
     /**
@@ -429,21 +424,16 @@ public class MainMenu extends Application {
       BorderPane.setAlignment(text3, Pos.BOTTOM_CENTER);
 
       Scene scene = new Scene(pane);
-      Stage window = new Stage();
-      window.setTitle("Radio Buttons");
-      window.setScene(scene);
-      window.show();
+      popUpWindow.setTitle("Radio Buttons");
+      popUpWindow.setScene(scene);
+      popUpWindow.show();
     }
 
     
     
-    private void createQuizPage(Stage window){
-        
-    }
+    
 
-    private void createResultsPage(Stage window){
-        
-    }
+    
 
     class ScanCSVFile implements Runnable{
       char searchForChar = ' ';

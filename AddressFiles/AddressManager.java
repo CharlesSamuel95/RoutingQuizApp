@@ -45,9 +45,13 @@ public class AddressManager{
     }
 
     public void copyIntoQuizList(){
-        for (Address address : addressList) {
+        for (Address address : addressList) 
             addressQuizList.add(address);
-        }
+    }
+
+    public void reset(){
+        for (Address address : addressQuizList) 
+            address.resetAnswerResultAndTextField();
     }
 
 }//end of AddressManager class

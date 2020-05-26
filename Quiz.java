@@ -8,6 +8,7 @@ import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContentDisplay;
@@ -29,9 +30,15 @@ import AddressFiles.AddressManager;
 //Ajusted the size of the list view
 public class Quiz {
     private Stage window;
+    private Stage resultStage = new Stage();
     private Scene quizScene;
+    private Scene resultScene;
     private AddressManager manager;
     private long questCount = 0;
+
+    private long questAttempted;
+    private long questCorrect;
+    private long questIncorrect;
     
     public Quiz(Stage window, AddressManager manager, long questCount) {
         this.window = window;
@@ -45,10 +52,14 @@ public class Quiz {
         HBox addressHB = new HBox(14);
 
         /**Page components */
-        ListView<String> questionsLV = new ListView<>(populateListView());
+        ListView<Label> questionsLV = new ListView<>(populateListView());
         TextField answerTF = new TextField();
         Button checkAnswerBtn = new Button("Check Answer");
         Button submitQuizBtn = new Button("Submit Quiz");
+
+        questAttempted = 0;
+        questCorrect = 0;
+        questIncorrect = 0;
 
         int index;
         Label address;
@@ -112,7 +123,7 @@ public class Quiz {
         });
 
         submitQuizBtn.setOnAction(e ->{
-            //
+            createResultScene();
         });
 
         
@@ -128,6 +139,7 @@ public class Quiz {
         /**Modifications to Panes */
 
          /**Set margins and alignment */
+        quizBP.disableProperty().bind(resultStage.showingProperty());
         HBox.setMargin(address, new Insets(10, 15, 0, 15));
 
         BorderPane.setMargin(checkAnswerBtn, new Insets(0, 10, 0, 20));
@@ -146,14 +158,15 @@ public class Quiz {
         return quizScene;
     }//end of createQuizScene
 
-    private void checkUserInput(ListView<String> questionsLV, TextField answerTF, 
+    /**NOTE: try to make image bacground transparent */
+    private void checkUserInput(ListView<Label> questionsLV, TextField answerTF, 
                                 Label addressLabel, HBox addressHB) {
 
         int index = questionsLV.getSelectionModel().getSelectedIndex();
         Address address = manager.getAddressQuizListItem(index);
         String answear = address.getRoutingNumber();
         Text result = (Text)addressLabel.getGraphic();
-        ImageView img;
+        ImageView imgView;
        
         //prevents code below from executing if text field edit property is false
         if(!address.getEditableTextField()){
@@ -166,21 +179,30 @@ public class Quiz {
 
         answerTF.setStyle(address.getTextFieldStyle());
         answerTF.setEditable(address.getEditableTextField());
-
         
         if(answear.compareToIgnoreCase(answerTF.getText()) == 0){
-            address.setAnswerResults("Correct");
-            img = new ImageView(new Image("images/check-mark.png")); 
+            address.setAnswerResults("Correct!!!");
+            imgView = new ImageView(new Image("images/check-mark.png")); 
+            questCorrect++;
         }
 
         else{
             address.setAnswerResults("Incorrect. The answer is " + address.getRoutingNumber());
-            img = new ImageView(new Image("images/x-mark.png"));
+            imgView = new ImageView(new Image("images/x-mark.png"));
+            questIncorrect++;
         }
 
-        img.setFitHeight(10);
-        img.setFitWidth(10);
-        //questionsLV.getSelectionModel().
+        questAttempted++;
+
+        imgView.setFitHeight(15);
+        imgView.setFitWidth(16);
+        //imgView.setStyle("-fx-background-color: transparent;");
+        
+        ObservableList<Label> questLabel = questionsLV.getSelectionModel().getSelectedItems();
+        questLabel.get(0).setGraphic(imgView);
+        questLabel.get(0).setContentDisplay(ContentDisplay.RIGHT);
+        //questLabel.get(0).setStyle("-fx-background-color:transparent;");
+
         result.setText(address.getAnswerResults());
         addressLabel.setGraphic(result);
         addressLabel.setContentDisplay(ContentDisplay.BOTTOM);
@@ -191,11 +213,51 @@ public class Quiz {
 
     }// end of checkUserInput()
 
-    private ObservableList<String> populateListView() {
-        List<String> qustList = new ArrayList<String>();
+    private void createResultScene(){
+        BorderPane resultBP = new BorderPane();
+        FlowPane textFP = new FlowPane();
+        HBox buttonBHBox = new HBox(10);
+        
+        Text numOfAttemp = new Text("Number of Attempted questions: " + questAttempted + "\n");
+        Text numOfCorrect = new Text("Number of Correct Answer(s): " + questCorrect + "\n");
+        Text numOfInCorrect = new Text("Number of Incorrect Answer(s): " + questIncorrect + "\n");
+
+        Button tryAgainBtn = new Button("Try Quiz Again");
+        Button changeNumOfQuestionsBtn = new Button("Change Number of Questions");
+        Button returnToMainMenuBtn = new Button("Return to Main Menu");
+
+        tryAgainBtn.setOnMouseEntered(e->{
+            resultScene.setCursor(Cursor.HAND);
+        });
+
+        tryAgainBtn.setOnMouseExited(e->{
+            resultScene.setCursor(Cursor.DEFAULT);
+        });
+
+        tryAgainBtn.setOnAction(e->{
+            resultScene.setCursor(Cursor.WAIT);
+            manager.reset();
+            window.setScene(createQuizScene());
+            resultStage.close();
+        });
+
+        textFP.getChildren().addAll(numOfAttemp,numOfCorrect,numOfInCorrect);
+        buttonBHBox.getChildren().addAll(tryAgainBtn,changeNumOfQuestionsBtn,returnToMainMenuBtn);
+
+        resultBP.setCenter(textFP);
+        resultBP.setBottom(buttonBHBox);
+
+        resultScene = new Scene(resultBP);
+        resultStage.setScene(resultScene);
+        resultStage.setTitle("Your Results");
+        resultStage.show();
+    }
+
+    private ObservableList<Label> populateListView() {
+        List<Label> qustList = new ArrayList<Label>();
         
         for(long qCount = 1; qCount <= questCount; qCount++)
-            qustList.add("Question " + qCount);
+            qustList.add(new Label("Question " + qCount));
         
         return FXCollections.observableArrayList(qustList);
     }//end of populateListView()

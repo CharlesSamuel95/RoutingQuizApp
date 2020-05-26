@@ -71,7 +71,13 @@ public class Address {
     }
 
     public String printPrefix(){
-        
         return getAddress() + ", " + getZipCode();
+    }
+
+    public void resetAnswerResultAndTextField(){
+        setAnswerResults("Enter the correct routing number.");
+        setTextFieldStyle("-fx-background-color:WHITE;");
+        setEditableTextField(true);
+        setUserRoutingNumber("");
     }
 }//end of class

@@ -102,7 +102,7 @@ public class NumberOfQuestions {
         /**Set margins and alignment */
        HBox.setMargin(numOfQuestLabel, new Insets(2, 5, 10, 5));
        HBox.setMargin(numOfQuestTextFeild, new Insets(2, 5, 10, 5));
-       HBox.setMargin(buttonBox, new Insets(15, 5, 5, 5));
+       HBox.setMargin(buttonBox, new Insets(15, 5, 20, 5));
        buttonBox.setAlignment(Pos.CENTER);
       
        /**Insert and return Scene */
