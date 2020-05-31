@@ -44,6 +44,10 @@ public class AddressManager{
         Collections.shuffle(addressQuizList);
     }
 
+    public void sortQuizList(){
+        Collections.sort(addressQuizList);
+    }
+
     public void copyIntoQuizList(){
         for (Address address : addressList) 
             addressQuizList.add(address);

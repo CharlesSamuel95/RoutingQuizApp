@@ -44,15 +44,17 @@ import AddressFiles.Address;
  * explanation on the function of each option. Once the user is satisfied they
  * can click the next buttun to procced to the next page for another option.
  */
+
+//Create a conformation Box.
 public class MainMenu extends Application {
-  Stage window = new Stage();
-  Stage popUpWindow = new Stage();
-  Scene mainMenu; //
-  ListView<Character> includedAddress; 
-  ArrayList<Character> listOfLetters = new ArrayList<>();
-  AddressManager manager = new AddressManager();
-  
-  int quizFormat = 0;
+  private static Stage window = new Stage();
+  private Stage popUpWindow = new Stage();
+  private Scene mainMenu; 
+  private ListView<Character> includedAddress; 
+  private static ArrayList<Character> listOfLetters = new ArrayList<>();
+  private static AddressManager manager = new AddressManager();
+  private static MainMenu mainMenuPage = null;
+  private static int quizFormat = 0;
 
   /**
    * Here for debuging purposes only. Launches the fx app
@@ -69,8 +71,34 @@ public class MainMenu extends Application {
   @Override
   public void start(Stage primarywindow) throws Exception {
     readAddressFile();
-    createMainMenu(window);
+    window.setResizable(false);
+    window.setTitle("Main Menu");
+    window.setScene(createMainMenu());
+    window.show();
   }// end of start
+
+  public MainMenu(){
+
+  }
+
+  public static MainMenu getInstance(){
+    if(mainMenuPage == null){
+      mainMenuPage = new MainMenu();
+    }
+    return mainMenuPage;
+  }
+
+  public Stage getWindow(){
+    return window;
+  }
+
+  public AddressManager getManager(){
+    return manager;
+  }
+
+  public int getQuizFormat(){
+    return quizFormat;
+  }
 
   /**
    * Reads from a csv file, adds the first charater from the address into
@@ -112,15 +140,8 @@ public class MainMenu extends Application {
         if (!contains(addressLetter)) {
           listOfLetters.add(new Character(addressLetter));
         }
-
-        //TRY TO REMOVE THE EMPTY STRINGS FROM THE ADDRESS. EX: LOOK AT ADDRESS WITH B QUESTION 5
-        if(addressSuffix.compareTo("") == 0){
-          manager.insert(new Address(addressPrefix, zipCode, routingNumber));
-        }
-
-        else{
+        
         manager.insert(new Address(addressPrefix, addressSuffix, zipCode, routingNumber));
-        }
       } // end of while
       scan.close();
     } // end of try
@@ -149,9 +170,9 @@ public class MainMenu extends Application {
   /**
    * Creates the Main Menu.
    * 
-   * @param window The stage object.
+   * 
    */
-  private void createMainMenu(Stage window) {
+  public Scene createMainMenu() {
     /** Main menu Panes */
     HBox hboxRadioOptions = new HBox(10);
     HBox hboxlistView = new HBox(10);
@@ -163,7 +184,7 @@ public class MainMenu extends Application {
     RadioButton randomBtn = new RadioButton("Random");
 
     Button nextPageBtn = new Button("Next Page");
-    Button resetListViewBtn = new Button("Reset");
+    Button resetListViewBtn = new Button("Deselect Items");
 
     ImageView questionImg = new ImageView(new Image("images/question-mark-image2.jpg"));
     ImageView questionImg2 = new ImageView(new Image("images/question-mark-image2.jpg"));
@@ -230,7 +251,7 @@ public class MainMenu extends Application {
       explainRadioButton();
     });
 
-    /**Set actions on Buttons */
+    /**Set actions on Buttons and Stage */
     nextPageBtn.setOnMouseEntered(e -> {
       mainMenu.setCursor(Cursor.HAND);
     });
@@ -253,6 +274,16 @@ public class MainMenu extends Application {
       includedAddress.getSelectionModel().clearSelection();
     });
 
+    window.setOnCloseRequest(e->{
+      if(popUpWindow.showingProperty().get()){
+        e.consume();
+      }
+
+      else{
+        //Create a conformation Box.
+      }
+    });
+
     /** Add nodes to panes */
     hboxRadioOptions.getChildren().addAll(questionImg2, radioButtonLabel, sequentialBtn, randomBtn);
     hboxlistView.getChildren().addAll(questionImg, listViewLabel, includedAddress);
@@ -272,10 +303,7 @@ public class MainMenu extends Application {
 
     /** Sets the Stage and Scene */
     mainMenu = new Scene(menu, 800, 250);
-    window.setResizable(false);
-    window.setTitle("Main Menu");
-    window.setScene(mainMenu);
-    window.show();
+    return mainMenu;
   }// end of createMainMenu
 
   // end to know: which item(s) in listview was selected.
@@ -295,7 +323,8 @@ public class MainMenu extends Application {
     else {
       // sequentail
     }
-    NumberOfQuestions quest = new NumberOfQuestions(window, mainMenu, manager);
+    //NumberOfQuestions quest = new NumberOfQuestions(window, mainMenu, manager,quizFormat);
+    NumberOfQuestions quest = new NumberOfQuestions(mainMenu);
     window.setScene(quest.createScene());
   }// end of createNextPage
 
@@ -341,11 +370,11 @@ public class MainMenu extends Application {
                     "The letters represents addresses that start with that letter.\n For example, " +
                     "'A' represents all addresses that start with 'A', 'B' represents all addresses\n " +
                     "that start with 'B', etc. Selecting an item will determine which addresses " +
-                    "will be included in the quiz.\n If 'A' is selected then all addresses that start " + 
+                    "will be included in the quiz.\n\n If 'A' is selected then all addresses that start " + 
                     "with 'A' will be included, etc. You can select multiple items in the listview " + 
                     "by holding Ctrl.\n If you only, for exapmle, choose 'A' and 'B' then the quiz will " + 
                     "only include addresses that start with A and B.\n" + "If you want to inclued all " +
-                    "address then either don't select an item" + "or click the reset button to " + 
+                    "address then either don't select an item " + "or click the Deselect Items button to " + 
                     "deselect all selected itmes.\n\n" + 
                     "NOTE: This does not determine the number of questions you will receive.";
       
@@ -386,7 +415,7 @@ public class MainMenu extends Application {
     private void explainRadioButton(){
       String t1 = " These buttons determine if questions will be received " +
       "sequentially (list ordering) or randomly.\n For example if you chose " + 
-      "to include only 'A' address and selects sequential,\n then the first few address " +
+      "to include only 'A' address and select sequential,\n then the first few address " +
       "(i.e questions) will be in this order\n";
 
       String t2 = 
@@ -453,10 +482,7 @@ public class MainMenu extends Application {
               String row = scan.nextLine();
               String data[] = row.split(",");
               
-              /**Remove this after you finish typing the address file */
-              /*if(data.length < 4)
-                break;*/
-            
+              
               String addressPrefix = data[0];
               String addressSuffix = data[1];
               String zipCode = data[2];

@@ -1,6 +1,6 @@
 package AddressFiles;
 
-public class Address {
+public class Address implements Comparable<Address> {
     private String address;
     private String zipCode;
     private String routingNumber;
@@ -10,18 +10,21 @@ public class Address {
     private String quizAnswerResults = "Enter the correct routing number.";
     private boolean editableTextField = true;
     
+    private int removeEmptySpaceNumber = 0;
     
-    public Address(String address, String 
+    public Address(String addressPrefix, String addressSuffix,String 
                     zipCode, String routingNumber){
-        this.address = address;
-        this.zipCode = zipCode;
-        this.routingNumber = routingNumber;
+        
+        removeEmptySpaceNumber = addressSuffix.charAt(0) + addressSuffix.charAt(1);
+        
+        if(removeEmptySpaceNumber == 68){
+            address = addressPrefix;
+        }
 
-    }
-
-    public Address(String address, String address2,String 
-                    zipCode, String routingNumber){
-        this.address = address + " " + address2;
+        else{
+            address = addressPrefix + " " + addressSuffix;
+        }
+          
         this.zipCode = zipCode;
         this.routingNumber = routingNumber;
     }
@@ -70,14 +73,39 @@ public class Address {
         editableTextField = edit;
     }
 
-    public String printPrefix(){
-        return getAddress() + ", " + getZipCode();
-    }
-
+    
     public void resetAnswerResultAndTextField(){
         setAnswerResults("Enter the correct routing number.");
         setTextFieldStyle("-fx-background-color:WHITE;");
         setEditableTextField(true);
         setUserRoutingNumber("");
+    }
+
+    public String printPrefix(){
+        return getAddress() + ", " + getZipCode();
+    }
+   
+    @Override
+    public int compareTo(Address address) {
+        String address1Prefix1 = "";
+        String address1Prefix2 = "";
+
+        if (Character.isWhitespace(this.getAddress().charAt(1))) {
+            address1Prefix1 = this.getAddress().substring(2);
+        }
+
+        else{
+            address1Prefix1 = this.getAddress();
+        }
+
+        if (Character.isWhitespace(address.getAddress().charAt(1))) {
+            address1Prefix2 = address.getAddress().substring(2);
+          }
+
+        else{
+            address1Prefix2 = address.getAddress();
+        }
+  
+        return address1Prefix1.compareTo(address1Prefix2);
     }
 }//end of class
