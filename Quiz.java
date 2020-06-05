@@ -6,7 +6,6 @@ import java.util.List;
 import javafx.stage.Stage;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
@@ -22,7 +21,6 @@ import javafx.scene.control.ToggleGroup;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.text.Font;
@@ -33,9 +31,8 @@ import AddressFiles.Address;
 import AddressFiles.AddressManager;
 
 
-//Try to make manager.sortQuizList sort list in list order
 //Try to remove background of check and x mark images
-//Create a conformation Box.
+
 public class Quiz {
     private Stage window;
     private Stage resultStage = new Stage();
@@ -66,6 +63,7 @@ public class Quiz {
         HBox addressHB = new HBox(14);
 
         /**Page components */
+        ConformationWindow win = new ConformationWindow();
         ListView<Label> questionsLV = new ListView<>(populateListView());
         TextField answerTF = new TextField();
         Button checkAnswerBtn = new Button("Check Answer");
@@ -141,12 +139,14 @@ public class Quiz {
         });
 
         window.setOnCloseRequest(e->{
-            if(resultStage.showingProperty().get()){
+            if(resultStage.showingProperty().get() || win.getWindow().showingProperty().get()){
               e.consume();
             }
       
             else{
               //Create a conformation Box.
+              e.consume();
+              win.createPopUpWindow(window);
             }
           });
 
@@ -164,6 +164,8 @@ public class Quiz {
 
          /**Set margins and alignment */
         quizBP.disableProperty().bind(resultStage.showingProperty());
+        quizBP.disableProperty().bind(win.getWindow().showingProperty());
+
         HBox.setMargin(address, new Insets(10, 15, 0, 15));
 
         BorderPane.setMargin(checkAnswerBtn, new Insets(0, 10, 0, 20));
@@ -177,7 +179,7 @@ public class Quiz {
         
 
         /**Insert and return Scene */
-        quizScene = new Scene(quizBP);
+        quizScene = new Scene(quizBP,700,400);
         window.setTitle("Quiz");
         return quizScene;
     }//end of createQuizScene
@@ -474,7 +476,7 @@ public class Quiz {
     private void setNewQuizFormat(Stage popUpWindow) {
         if(newQuizFormat != quizFormat){
             if(newQuizFormat == 0){
-                manager.sortQuizList();
+                manager.sequentialSortQuizList(mainMenu.getSelectedItemsListView());
                 quizFormat = 0;
             }
 

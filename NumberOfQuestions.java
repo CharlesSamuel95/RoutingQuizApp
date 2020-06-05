@@ -23,7 +23,7 @@ import java.text.NumberFormat;
 
 import AddressFiles.Address;
 
-//Create a conformation Box.
+
 public class NumberOfQuestions {
     private Stage window;
     private Scene mainMenuScene;
@@ -47,6 +47,7 @@ public class NumberOfQuestions {
         HBox buttonBox = new HBox(40);
        
         /**Page components */
+        ConformationWindow win = new ConformationWindow();
         NumberFormat formatQuestSize = NumberFormat.getInstance();
         formatQuestSize.setGroupingUsed(true);
 
@@ -105,6 +106,18 @@ public class NumberOfQuestions {
             numOfQuestScene.setCursor(Cursor.DEFAULT);
        });
 
+       window.setOnCloseRequest(e->{
+        if(win.getWindow().showingProperty().get()){
+          e.consume();
+        }
+  
+        else{
+          //Create a conformation Box.
+          e.consume();
+          win.createPopUpWindow(window);
+        }
+      });
+
        
        /**Add to Panes */
        textFeildGridPane.add(numOfQuestLabel, 0, 0);
@@ -118,6 +131,7 @@ public class NumberOfQuestions {
        numOfQuestPageBorderPane.setBottom(buttonBox);
 
        /**Modifications to Panes */
+       numOfQuestPageBorderPane.disableProperty().bind(win.getWindow().showingProperty());
 
         /**Set margins and alignment */
        GridPane.setMargin(numOfQuestLabel, new Insets(2, 5, 10, 5));

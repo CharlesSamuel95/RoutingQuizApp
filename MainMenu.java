@@ -1,7 +1,6 @@
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Scanner;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
@@ -10,7 +9,6 @@ import javafx.stage.Stage;
 import javafx.scene.Cursor;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.RadioButton;
@@ -20,7 +18,6 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.geometry.HPos;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
@@ -45,12 +42,12 @@ import AddressFiles.Address;
  * can click the next buttun to procced to the next page for another option.
  */
 
-//Create a conformation Box.
+
 public class MainMenu extends Application {
   private static Stage window = new Stage();
   private Stage popUpWindow = new Stage();
   private Scene mainMenu; 
-  private ListView<Character> includedAddress; 
+  private static ListView<Character> includedAddress; 
   private static ArrayList<Character> listOfLetters = new ArrayList<>();
   private static AddressManager manager = new AddressManager();
   private static MainMenu mainMenuPage = null;
@@ -100,6 +97,10 @@ public class MainMenu extends Application {
     return quizFormat;
   }
 
+  public ObservableList<Character> getSelectedItemsListView(){
+    return includedAddress.getSelectionModel().getSelectedItems();
+  }
+
   /**
    * Reads from a csv file, adds the first charater from the address into
    * listOfLetters, and creates Address objects from the read data.
@@ -122,12 +123,29 @@ public class MainMenu extends Application {
         String row = scan.nextLine();
         String data[] = row.split(",");
 
-        String addressPrefix = data[0];
-        String addressSuffix = data[1];
-        String zipCode = data[2];
-        String routingNumber = data[3];
-
+        String addressRange = "";
+        String addressPrefix = "";
+        String addressSuffix = "";
+        String zipCode = "";
+        String routingNumber = "";
         char addressLetter = ' ';
+
+        if(data.length == 5){
+          addressRange = data[0];
+          addressPrefix = data[1];
+          addressSuffix = data[2];
+          zipCode = data[3];
+          routingNumber = data[4];
+        }
+
+        else{
+          addressRange = "";
+          addressPrefix = data[0];
+          addressSuffix = data[1];
+          zipCode = data[2];
+          routingNumber = data[3];
+        }
+        
 
         if (!Character.isWhitespace(addressPrefix.charAt(1))) {
           addressLetter = addressPrefix.charAt(0);
@@ -141,7 +159,7 @@ public class MainMenu extends Application {
           listOfLetters.add(new Character(addressLetter));
         }
         
-        manager.insert(new Address(addressPrefix, addressSuffix, zipCode, routingNumber));
+        manager.insert(new Address(addressRange,addressPrefix, addressSuffix, zipCode, routingNumber));
       } // end of while
       scan.close();
     } // end of try
@@ -179,6 +197,7 @@ public class MainMenu extends Application {
     GridPane menu = new GridPane();
 
     /** Main menu components */
+    ConformationWindow win = new ConformationWindow();
     Text introText = new Text("Welcome, Please choose your quiz options and hit the next page button\n");
     RadioButton sequentialBtn = new RadioButton("Sequential");
     RadioButton randomBtn = new RadioButton("Random");
@@ -275,12 +294,14 @@ public class MainMenu extends Application {
     });
 
     window.setOnCloseRequest(e->{
-      if(popUpWindow.showingProperty().get()){
+      if(popUpWindow.showingProperty().get() || win.getWindow().showingProperty().get()){
         e.consume();
       }
 
       else{
         //Create a conformation Box.
+        e.consume();
+        win.createPopUpWindow(getWindow());
       }
     });
 
@@ -300,6 +321,7 @@ public class MainMenu extends Application {
     menu.setHgap(25);
     menu.setVgap(7);
     menu.disableProperty().bind(popUpWindow.showingProperty());
+    menu.disableProperty().bind(win.getWindow().showingProperty());
 
     /** Sets the Stage and Scene */
     mainMenu = new Scene(menu, 800, 250);
@@ -330,27 +352,26 @@ public class MainMenu extends Application {
 
 
   // have threads read file
-  private void includeSubsetOfAddress(ObservableList<Character> selectedItemsList) {
-    List<Thread> threadList = new ArrayList<>();
+  private void includeSubsetOfAddress(ObservableList<Character> selectedItems) {
+    for (Address address : manager.getAddressList()) {
+      for (Character character : selectedItems) {
+          Character c = ' ';
 
-    for (Character character : selectedItemsList) {
-      ScanCSVFile scan = new ScanCSVFile(character);
-      Thread thread = new Thread(scan);
-      threadList.add(thread);
-    }
+          if (Character.isWhitespace(address.getAddress().charAt(1))) {
+              c = address.getAddress().charAt(2);
+          }
+  
+          else{
+              c = address.getAddress().charAt(0);
+          }
 
-    for (Thread thread : threadList) {
-      thread.start();
-    }
+          if(c.charValue() == character.charValue()){
+              manager.insertIntoQuizList(address);
+          }
+      }//end of inner
+    }//end of outer
+   
 
-    for (Thread thread : threadList) {
-      try {
-        thread.join();
-      } 
-      catch (InterruptedException e) {
-        e.printStackTrace();
-      }
-    }
   }//end of includeSubsetOfAddress
 
    /**
@@ -388,7 +409,7 @@ public class MainMenu extends Application {
       popUpWindow.setScene(scene);
       popUpWindow.show();
       
-    }
+    }//end of explainListView()
 
     /**
      * Creates a window that explains the radio button options.
@@ -456,63 +477,6 @@ public class MainMenu extends Application {
       popUpWindow.setTitle("Radio Buttons");
       popUpWindow.setScene(scene);
       popUpWindow.show();
-    }
-
-    
-    
-    
-
-    
-
-    class ScanCSVFile implements Runnable{
-      char searchForChar = ' ';
-      
-      public ScanCSVFile(char character){
-          searchForChar = character;
-      }
-
-      @Override
-      public void run() {
-          Scanner scan;
-
-          try {
-            scan = new Scanner(new File("AddressFiles/Address.csv"));
-            
-            while(scan.hasNext()){ 
-              String row = scan.nextLine();
-              String data[] = row.split(",");
-              
-              
-              String addressPrefix = data[0];
-              String addressSuffix = data[1];
-              String zipCode = data[2];
-              String routingNumber = data[3];
-      
-              char addressLetter = ' ';
-      
-              if(!Character.isWhitespace(addressPrefix.charAt(1))){
-                addressLetter = addressPrefix.charAt(0);
-              }
-      
-              else{
-                addressLetter = addressPrefix.charAt(2);
-              }
-      
-              if(addressLetter == searchForChar){
-                manager.insertIntoQuizList(new Address(addressPrefix,addressSuffix,zipCode,routingNumber));
-              }
-
-              else{continue;}
-           }//end of while
-           scan.close();
-
-          }//end of try 
-          
-          catch (FileNotFoundException e) {
-              e.printStackTrace();
-          }
-          
-      }//end of run
-  }//end of ScanCSVFile class
+    }//end of explainRadioButton()
 
 }//end of MainMenu class

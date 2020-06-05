@@ -1,10 +1,12 @@
 package AddressFiles;
 
-public class Address implements Comparable<Address> {
+public class Address {
+    private String primaryRange;
     private String address;
     private String zipCode;
     private String routingNumber;
     private String userRoutingNumber = "";
+    
 
     private String quizTextFieldStyle = "-fx-background-color:WHITE;";
     private String quizAnswerResults = "Enter the correct routing number.";
@@ -12,7 +14,7 @@ public class Address implements Comparable<Address> {
     
     private int removeEmptySpaceNumber = 0;
     
-    public Address(String addressPrefix, String addressSuffix,String 
+    public Address(String range,String addressPrefix, String addressSuffix,String 
                     zipCode, String routingNumber){
         
         removeEmptySpaceNumber = addressSuffix.charAt(0) + addressSuffix.charAt(1);
@@ -24,9 +26,14 @@ public class Address implements Comparable<Address> {
         else{
             address = addressPrefix + " " + addressSuffix;
         }
-          
+
+        primaryRange = range;  
         this.zipCode = zipCode;
         this.routingNumber = routingNumber;
+    }
+
+    public String getPrimaryRange(){
+        return primaryRange;
     }
 
     public String getAddress(){
@@ -82,30 +89,12 @@ public class Address implements Comparable<Address> {
     }
 
     public String printPrefix(){
-        return getAddress() + ", " + getZipCode();
+        if(getPrimaryRange().length() != 0){
+            return getPrimaryRange() + ", " + getAddress() + ", " + getZipCode();
+        }
+        else{
+            return getAddress() + ", " + getZipCode();
+        }
     }
    
-    @Override
-    public int compareTo(Address address) {
-        String address1Prefix1 = "";
-        String address1Prefix2 = "";
-
-        if (Character.isWhitespace(this.getAddress().charAt(1))) {
-            address1Prefix1 = this.getAddress().substring(2);
-        }
-
-        else{
-            address1Prefix1 = this.getAddress();
-        }
-
-        if (Character.isWhitespace(address.getAddress().charAt(1))) {
-            address1Prefix2 = address.getAddress().substring(2);
-          }
-
-        else{
-            address1Prefix2 = address.getAddress();
-        }
-  
-        return address1Prefix1.compareTo(address1Prefix2);
-    }
 }//end of class

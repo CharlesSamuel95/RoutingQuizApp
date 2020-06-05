@@ -1,7 +1,11 @@
 package AddressFiles;
+
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Collections; 
+
+import javafx.collections.ObservableList;
+
+import java.util.Collections;
 
 public class AddressManager{
     private static List<Address> addressList = new ArrayList<>();
@@ -44,9 +48,34 @@ public class AddressManager{
         Collections.shuffle(addressQuizList);
     }
 
-    public void sortQuizList(){
-        Collections.sort(addressQuizList);
-    }
+    public void sequentialSortQuizList(ObservableList<Character> selectedItems){
+        addressQuizList.clear();
+
+        if(selectedItems.size() == 0){
+            copyIntoQuizList();
+        }
+
+        else{
+            for (Address address : addressList) {
+                for (Character character : selectedItems) {
+                    Character c = ' ';
+
+                    if (Character.isWhitespace(address.getAddress().charAt(1))) {
+                        c = address.getAddress().charAt(2);
+                    }
+            
+                    else{
+                        c = address.getAddress().charAt(0);
+                    }
+
+                    if(c.charValue() == character.charValue()){
+                        insertIntoQuizList(address);
+                    }
+                }//end of inner
+            }//end of outer
+        }//end of else
+    }//end of sequentialSortQuizList()
+
 
     public void copyIntoQuizList(){
         for (Address address : addressList) 
