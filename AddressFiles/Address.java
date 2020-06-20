@@ -8,7 +8,7 @@ public class Address {
     private String userRoutingNumber = "";
     
 
-    private String quizTextFieldStyle = "-fx-background-color:WHITE;";
+    private String quizTextFieldStyle = "-fx-background-color:WHITE; -fx-border-color: black ; -fx-border-width: 2 ; -fx-border-style: solid;";
     private String quizAnswerResults = "Enter the correct routing number.";
     private boolean editableTextField = true;
     
@@ -83,7 +83,7 @@ public class Address {
     
     public void resetAnswerResultAndTextField(){
         setAnswerResults("Enter the correct routing number.");
-        setTextFieldStyle("-fx-background-color:WHITE;");
+        setTextFieldStyle("-fx-background-color:WHITE; -fx-border-color: black ; -fx-border-width: 2 ; -fx-border-style: solid;");
         setEditableTextField(true);
         setUserRoutingNumber("");
     }
