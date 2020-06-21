@@ -2,18 +2,18 @@
 <launch4jConfig>
   <dontWrapJar>false</dontWrapJar>
   <headerType>gui</headerType>
-  <jar>C:\Users\Monokuma\Desktop\RoutingQuizApp\Program-Components\MyJar.jar</jar>
+  <jar>C:\Users\Monokuma\Desktop\RoutingQuizApp\MyJar.jar</jar>
   <outfile>C:\Users\Monokuma\Desktop\RoutingQuizApp\RoutingQuiz.exe</outfile>
   <errTitle></errTitle>
   <cmdLine></cmdLine>
-  <chdir></chdir>
+  <chdir>.</chdir>
   <priority>normal</priority>
   <downloadUrl>http://java.com/download</downloadUrl>
   <supportUrl></supportUrl>
   <stayAlive>false</stayAlive>
   <restartOnCrash>true</restartOnCrash>
   <manifest></manifest>
-  <icon>C:\Users\Monokuma\Desktop\RoutingQuizApp\Program-Components\images\favicon.ico</icon>
+  <icon>C:\Users\Monokuma\Desktop\RoutingQuizApp\images\favicon.ico</icon>
   <jre>
     <path>C:\Program Files\Java\jre1.8.0_251</path>
     <bundledJre64Bit>false</bundledJre64Bit>
@@ -23,4 +23,18 @@
     <jdkPreference>preferJre</jdkPreference>
     <runtimeBits>64/32</runtimeBits>
   </jre>
+  <versionInfo>
+    <fileVersion>1.8.0.0</fileVersion>
+    <txtFileVersion>1.8.0.0</txtFileVersion>
+    <fileDescription>Program creates quiz to help users remember routing numbers</fileDescription>
+    <copyright>CS Group</copyright>
+    <productVersion>1.8.0.0</productVersion>
+    <txtProductVersion>1.8.0.0</txtProductVersion>
+    <productName>RoutingQuiz</productName>
+    <companyName>CS Group</companyName>
+    <internalName>CS Group</internalName>
+    <originalFilename>RoutingQuiz.exe</originalFilename>
+    <trademarks></trademarks>
+    <language>ENGLISH_US</language>
+  </versionInfo>
 </launch4jConfig>
